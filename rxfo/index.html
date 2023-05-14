@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="plotly-2.20.0.min.js" charset="utf-8"></script>
+    <script src="module.js" charset="utf-8"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="stylesheet.css">
+</head>
+
+<body>
+    <h1>Custom Range Slider</h1>
+    <p>Drag the slider to display the current value.</p>
+
+    <div class="slidecontainer">
+        <input type="range" min="1" max="100" value="50" class="slider" id="myRange"> 
+    </div>
+    <div id="plot" style="width:600px;height:600px;"></div>
+    <script>
+        var slider = document.getElementById("myRange");
+
+        function plotme(n) {
+            var trace3 = {
+                x: lin(n),
+                y: lin(n),
+                mode: 'lines+markers',
+                type: 'scatter'
+            };
+
+            var data = [trace3];
+
+            return Plotly.newPlot(plot, data);
+        }
+
+        function callback() {
+            console.log(plotme(Number(slider.value)));
+        }
+        slider.oninput = callback;
+        plotme(Number(slider.value));
+    </script>
+
+</body>
+
+</html>
