@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <!-- <script>
+        function autoreload() {
+            location.reload();
+        }
+        setInterval(autoreload, 3000);
+    </script> -->
+    <script src="plotly-2.20.0.min.js" charset="utf-8"></script>
+    <script src="module.js" charset="utf-8"></script>
+    <script src="data.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"
+        integrity="sha512-DmQnZdEjFh4R/040JxDSg3j9cS8D0oC5u2noG9Az18F11leiDFwrTOkm9PP+jdBMiH66QBa73O+54kZr5FyU7w=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="stylesheet.css">
+</head>
+
+<body>
+    <div id="plot1"></div>
+    <div id="plot2"></div>
+    <div id="plot3"></div>
+    <script>
+        data = JSON.parse(x)
+        var N = math.random([40, 40])
+        var trace1a = {
+            x: data.t,
+            y: data.D,
+            z: data.S,
+            // zmin: 2,
+            // zmax: 7,
+            type: 'heatmap',
+            cauto: false,
+            line: {
+                color: 'rgb(162,181,205)',
+                width: 5
+            },
+            // zmin: -0.02,
+            // zmax: 0.42,
+            colorscale: "Portland",
+            colorbar: {
+                title: "<b> dN/dlnD (cm⁻³)</b>",
+                tickfont: { size: 10 },
+                nticks: 5,
+                orientation: "h",
+                outlinewidth: 0,
+                thickness: 8,
+                xanchor: "left",
+                x: 0.0,
+                xpad: 0,
+                ticklen: 7,
+                // tickvals: [2, 3, 4, 5, 6, 7],
+                ticks: "inside",
+                len: 1.0,
+                side: "top",
+                y: 0.88
+            },
+        };
+
+        var trace1b = {
+            x: data.grt,
+            y: data.grD,
+            type: 'line',
+            name: '27 nm/hr',
+            cauto: false,
+            line: {
+                color: 'rgb(0,0,0)',
+                width: 1
+            },
+        };
+
+        var layout1 = {
+            title: "",
+            showlegend: true,
+            font: { size: 12 },
+            margin: {
+                l: 60,
+                r: 150,
+                b: 2,
+                t: 80,
+                pad: 4
+            },
+            height: 160,
+            xaxis: {
+                range: ["2022-09-05 9:00:00", "2022-09-05 18:00:00"],
+                // range: ["2022-08-17 00:00:00", "2022-08-18 00:00:00"]
+            },
+            yaxis: {
+                // range: Math.log([10,100]),
+                type: "log",
+                title: { text: "D (nm)", standoff: 9 },
+                tickvals: [10, 20, 50, 100],
+                ticks: ""
+            }
+        };
+
+        var trace2a = {
+            x: data.t,
+            y: data.Nt,
+            type: 'line',
+            name: 'SMPS',
+            cauto: false,
+            line: {
+                color: 'rgb(0,0,0)',
+                width: 1
+            },
+        };
+
+        var trace2b = {
+            x: data.tcpc,
+            y: data.Ncpc,
+            type: 'line',
+            name: 'CPC',
+            cauto: false,
+            line: {
+                color: 'rgb(0.55,0,0)',
+                width: 1
+            },
+        };
+
+        var layout2 = {
+            title: "",
+            font: { size: 12 },
+            showlegend: true,
+            margin: {
+                l: 60,
+                r: 150,
+                b: 8,
+                t: 0,
+                pad: 4
+            },
+            // width: 600,
+            height: 90,
+            xaxis: {
+                // title: { text: "Local Time", standoff: 0 },
+                side: "bottom",
+                ticks: "inside",
+                range: ["2022-09-05 9:00:00", "2022-09-05 18:00:00"],
+                minor: { showgrid: true, gridcolor: "#eeeeee" },
+            },
+            yaxis: {
+                title: { text: "N (cm⁻³)", standoff: 9 },
+                range: [0, 100000],
+                tickvals: [0, 20000,  40000, 60000, 80000,100000]
+            }
+        };
+
+        var trace3a = {
+            x: data.tgf20,
+            y: data.k20,
+            type: 'line',
+            name: '20 nm',
+            line: {
+                color: 'rgb(0,0,0)',
+                width: 1
+            },
+        };
+
+        var trace3b = {
+            x: data.tgf30,
+            y: data.k30,
+            type: 'line',
+            name: '30 nm',
+            line: {
+                color: 'rgb(0.55,0,0)',
+                width: 1
+            },
+        };
+
+        var trace3c = {
+            x: data.tgf40,
+            y: data.k40,
+            type: 'line',
+            name: '40 nm',
+            line: {
+                color: 'rgb(0.8,0.58,0.05)',
+                width: 1
+            },
+        };
+
+        var trace3d = {
+            x: data.tgf50,
+            y: data.k50,
+            type: 'line',
+            name: '50 nm',
+            line: {
+                color: 'rgb(0.64,0.71,0.8)',
+                width: 1
+            },
+        };
+
+        var layout3 = {
+            title: "",
+            font: { size: 12 },
+            showlegend: true,
+            margin: {
+                l: 60,
+                r: 150,
+                b: 100,
+                t: 0,
+                pad: 4
+            },
+            // width: 600,
+            height: 190,
+            xaxis: {
+                // title: { text: "UTC Time", standoff: 0 },
+                side: "bottom",
+                ticks: "inside",
+                range: ["2022-09-05 9:00:00", "2022-09-05 18:00:00"],
+                minor: { showgrid: true, gridcolor: "#eeeeee" }
+            },
+            yaxis: {
+                title: { text: "κ (-)", standoff: 12 },
+                range: [0, 0.6],
+                tickvals: [0, 0.2, 0.4, 0.6, 0.8, 1.0]
+            }
+        };
+
+
+        var config = {
+            responsive: true,
+            scrollZoom: true,
+            staticPlot: false,
+            displayModeBar: false
+        }
+
+        // data = trace1//, trace2
+
+        Plotly.newPlot(plot1, [trace1a, trace1b], layout1, config);
+        Plotly.newPlot(plot2, [trace2a, trace2b], layout2, config);
+        Plotly.newPlot(plot3, [trace3a, trace3b, trace3c, trace3d], layout3, config);
+        console.log(Date.parse(data.t[10]))
+    </script>
+
+</body>
+
+</html>
