@@ -62,7 +62,9 @@ function gf2kappa(gf, RH, Dd)
     return (gf^3.0 - 1.0) * (1.0 - aw) / aw
 end
 
-df = CSV.read("../level3dataall/hou120ncsuhtdmainvertedM1.b1.20220720.csv", DataFrame; header=false)
+# df = CSV.read("../level3dataall/hou120ncsuhtdmainvertedM1.b1.20220720.csv", DataFrame; header=false)
+df = CSV.read("../flaggedlevel3/invertedflaggedHTDMA.csv", DataFrame)
+allowmissing!(df)
 Dds = unique(df[!, 3])
 
 function get_mode(myDd)
@@ -99,10 +101,14 @@ ii = (smps.Dp .> 8) .& (smps.Dp .< 110)
 myS = smps.S[ii, :]'
 myS[myS.<0] .= NaN
 
-tgf50, modek50, modegf50, gM50 = get_mode(Dds[1])
-tgf40, modek40, modegf40, gM40 = get_mode(Dds[5])
-tgf30, modek30, modegf30, gM30 = get_mode(Dds[2])
-tgf20, modek20, modegf20, gM20 = get_mode(Dds[4])
+tgf50, modek50, modegf50, gM50 = get_mode(Dds[5])
+tgf40, modek40, modegf40, gM40 = get_mode(Dds[4])
+tgf30, modek30, modegf30, gM30 = get_mode(Dds[3])
+tgf20, modek20, modegf20, gM20 = get_mode(Dds[2])
+# tgf50, modek50, modegf50, gM50 = get_mode(Dds[1])
+# tgf40, modek40, modegf40, gM40 = get_mode(Dds[5])
+# tgf30, modek30, modegf30, gM30 = get_mode(Dds[2])
+# tgf20, modek20, modegf20, gM20 = get_mode(Dds[4])
 
 grt = DateTime(2022,7,25,10,30,0):Minute(1):DateTime(2022,7,25,12,30,0) |> collect
 len = Dates.value(grt[end] .- grt[1])  / 1000 
