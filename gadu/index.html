@@ -72,6 +72,18 @@
             },
         };
 
+        var trace1b2 = {
+            x: data.grt2,
+            y: data.grD2,
+            type: 'line',
+            name: '8.75 nm/hr',
+            cauto: false,
+            line: {
+                color: 'rgb(0,0,0)',
+                width: 1
+            },
+        };
+
         var layout1 = {
             title: "",
             showlegend: true,
@@ -229,9 +241,13 @@
 
         // data = trace1//, trace2
 
-        Plotly.newPlot(plot1, [trace1a, trace1b], layout1, config);
+        Plotly.newPlot(plot1, [trace1a, trace1b,trace1b2], layout1, config);
         Plotly.newPlot(plot2, [trace2a, trace2b], layout2, config);
-        Plotly.newPlot(plot3, [trace3a, trace3b, trace3c, trace3d], layout3, config);
+        Plotly.newPlot(plot3, [trace3a, trace3b,trace3c, trace3d], layout3, config);
+
+        // Plotly.newPlot(plot1, [trace1a, trace1b,trace1b2], layout1, config);
+        // Plotly.newPlot(plot2, [trace2a, trace2b], layout2, config);
+        // Plotly.newPlot(plot3, [trace3a], layout3, config);
         console.log(Date.parse(data.t[10]))
     </script>
 

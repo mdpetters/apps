@@ -62,11 +62,12 @@ function gf2kappa(gf, RH, Dd)
     return (gf^3.0 - 1.0) * (1.0 - aw) / aw
 end
 
-df = CSV.read("../flaggedlevel3/invertedflaggedHTDMA.csv", DataFrame)
-allowmissing!(df)
-
+df = CSV.read("../flaggedlevel3/invertedflaggedHTDMA23june.csv", DataFrame)
+df = mapcols(col -> replace(col, missing .=> NaN), df)
+# disallowmissing!(df[: ,8:end])
+# df[:,8:end].= missing = NaN
 Dds = unique(df[!, 3])
-
+# myS[myS.<0] .= NaN
 function get_mode(myDd)
     df1 = @chain df begin
         filter(:Column3 => D -> D .== myDd, _)
@@ -106,15 +107,28 @@ tgf40, modek40, modegf40, gM40 = get_mode(Dds[4])
 tgf30, modek30, modegf30, gM30 = get_mode(Dds[3])
 tgf20, modek20, modegf20, gM20 = get_mode(Dds[2])
 
-# tgf50, modek50, modegf50, gM50 = get_mode(Dds[1])
-# tgf40, modek40, modegf40, gM40 = get_mode(Dds[5])
-# tgf30, modek30, modegf30, gM30 = get_mode(Dds[2])
-# tgf20, modek20, modegf20, gM20 = get_mode(Dds[4])
+
+
+modek20[modek20 .< 0] .= NaN
+
+
+modek30[modek30 .< 0] .= NaN
+
+modek40[modek40 .< 0] .= NaN
+
+
+modek50[modek50 .< 0] .= NaN
+
 
 grt = DateTime(2022,6,23,12,18,0):Minute(1):DateTime(2022,6,23,13,40,0) |> collect
 len = Dates.value(grt[end] .- grt[1])  / 1000 
 gr = 15.50./60
 grD = 12.0 .+ gr*(0:1:len) |> collect
+
+grt2 = DateTime(2022,6,23,09,48,0):Minute(1):DateTime(2022,6,23,13,10,0) |> collect
+len2 = Dates.value(grt2[end] .- grt2[1])  / 1000 
+gr2 = 8.75./60
+grD2 = 22.0 .+ gr2*(0:1:len2) |> collect
 
 data = Dict(("D" => smps.Dp[ii]), ("S" => (myS)),
     ("t" => t), ("Nt" => smps.Nt), 
@@ -123,7 +137,8 @@ data = Dict(("D" => smps.Dp[ii]), ("S" => (myS)),
     ("tgf40" => tgf40), ("k40" => modek40),
     ("tgf50" => tgf50), ("k50" => modek50),
     ("tcpc" => cpcu.df[!,:t].-Hour(5)), ("Ncpc" => cpcu.df[!,:N]),
-    ("grt" => grt), ("grD" => grD))
+    ("grt" => grt), ("grD" => grD),
+    ("grt2" => grt2), ("grD2" => grD2))
 jdata = JSON.json(data)
 
 open("data.js", "w") do file
