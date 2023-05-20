@@ -64,7 +64,8 @@ end
 
 # df = CSV.read("../level3dataall/hou120ncsuhtdmainvertedM1.b1.20220720.csv", DataFrame; header=false)
 df = CSV.read("../flaggedlevel3/invertedflaggedHTDMA.csv", DataFrame)
-allowmissing!(df)
+# allowmissing!(df)
+
 Dds = unique(df[!, 3])
 
 function get_mode(myDd)
@@ -95,25 +96,32 @@ ts = DateTime(ss):Minute(1):(DateTime(ss)+Day(2)-Second(1))
 smps = load_aossmps(ss, ts)
 cpcu = load_cpcu(ss, ts)
 
+CPCUT1 =  cpcu.df.t - Hour(5)
+CPCUTii = (CPCUT1 .> DateTime(2022,07,25,12,03,00)) .& (CPCUT1 .< DateTime(2022,07,25,12,23,00))
+cpcu.df.N[CPCUTii] .= NaN
+
 t = Dates.format.(smps.t .- Hour(5), "yyyy-mm-dd HH:MM:SS") 
+
 ii = (smps.Dp .> 8) .& (smps.Dp .< 110)
+
+jam1 = smps.t .- Hour(5)
+kk = findall((jam1 .> DateTime(2022,07,25,12,03,00)) .& (jam1 .< DateTime(2022,07,25,12,23,00)))
 
 myS = smps.S[ii, :]'
 myS[myS.<0] .= NaN
 
+smps.Nt[kk] .= NaN
+myS[kk,:] .=NaN
 tgf50, modek50, modegf50, gM50 = get_mode(Dds[5])
 tgf40, modek40, modegf40, gM40 = get_mode(Dds[4])
 tgf30, modek30, modegf30, gM30 = get_mode(Dds[3])
 tgf20, modek20, modegf20, gM20 = get_mode(Dds[2])
-# tgf50, modek50, modegf50, gM50 = get_mode(Dds[1])
-# tgf40, modek40, modegf40, gM40 = get_mode(Dds[5])
-# tgf30, modek30, modegf30, gM30 = get_mode(Dds[2])
-# tgf20, modek20, modegf20, gM20 = get_mode(Dds[4])
+
 
 grt = DateTime(2022,7,25,10,30,0):Minute(1):DateTime(2022,7,25,12,30,0) |> collect
 len = Dates.value(grt[end] .- grt[1])  / 1000 
-gr = 13.50./60
-grD = 15.0 .+ gr*(0:1:len) |> collect
+gr = 6.50./60
+grD = 10.0 .+ gr*(0:1:len) |> collect
 
 data = Dict(("D" => smps.Dp[ii]), ("S" => (myS)),
     ("t" => t), ("Nt" => smps.Nt), 
@@ -121,6 +129,7 @@ data = Dict(("D" => smps.Dp[ii]), ("S" => (myS)),
     ("tgf30" => tgf30), ("k30" => modek30),
     ("tgf40" => tgf40), ("k40" => modek40),
     ("tgf50" => tgf50), ("k50" => modek50),
+    # ("tcpc" => [!,:t].-Hour(5)), ("Ncpc" => d[!,:N]),
     ("tcpc" => cpcu.df[!,:t].-Hour(5)), ("Ncpc" => cpcu.df[!,:N]),
     ("grt" => grt), ("grD" => grD))
 jdata = JSON.json(data)
