@@ -107,15 +107,39 @@ tgf40, modek40, modegf40, gM40 = get_mode(Dds[4])
 tgf30, modek30, modegf30, gM30 = get_mode(Dds[3])
 tgf20, modek20, modegf20, gM20 = get_mode(Dds[2])
 
-# tgf50, modek50, modegf50, gM50 = get_mode(Dds[1])
-# tgf40, modek40, modegf40, gM40 = get_mode(Dds[5])
-# tgf30, modek30, modegf30, gM30 = get_mode(Dds[2])
-# tgf20, modek20, modegf20, gM20 = get_mode(Dds[4])
+modek20[modek20 .< 0] .= NaN
+modek30[modek30 .< 0] .= NaN
+modek40[modek40 .< 0] .= NaN
+modek50[modek50 .< 0] .= NaN
 
-grt = DateTime(2022,6,10,11,26,0):Minute(1):DateTime(2022,6,10,12,48,0) |> collect
+# event 1 k----
+event1ii50 = (tgf50 .>= DateTime(2022,6,10,10,56,0)) .& (tgf50.<= DateTime(2022,6,10,12,48,0) )
+event1ii40 = (tgf40 .>= DateTime(2022,6,10,10,56,0)) .& (tgf40.<= DateTime(2022,6,10,12,48,0) )
+event1ii30 = (tgf30 .>= DateTime(2022,6,10,10,56,0)) .& (tgf30.<= DateTime(2022,6,10,12,48,0) )
+event1ii20 = (tgf20 .>= DateTime(2022,6,10,10,56,0)) .& (tgf20.<= DateTime(2022,6,10,12,48,0) )
+
+
+modekall = vcat(modek20[event1ii20],modek30[event1ii30],modek40[event1ii40],modek50[event1ii50])
+events = filter(!isnan, modekall)
+eventk_allnm = mean(events)
+eventk_allstdnm = std(events)
+# event 1 prior k----
+pevent1ii50 = (tgf50 .> DateTime(2022,6,10,08,56,0)) .& (tgf50.< DateTime(2022,6,10,10,56,0) )
+pevent1ii40 = (tgf40 .> DateTime(2022,6,10,08,56,0)) .& (tgf40.< DateTime(2022,6,10,10,56,0) )
+pevent1ii30 = (tgf30 .> DateTime(2022,6,10,08,56,0)) .& (tgf30.< DateTime(2022,6,10,10,56,0) )
+pevent1ii20 = (tgf20 .> DateTime(2022,6,10,08,56,0)) .& (tgf20.< DateTime(2022,6,10,10,56,0) )
+
+modekpall = vcat(modek20[pevent1ii20],modek30[pevent1ii30],modek40[pevent1ii40],modek50[pevent1ii50])
+pevents = filter(!isnan, modekpall)
+peventk_allnm = mean(pevents)
+peventk_allstdnm = std(pevents)
+
+
+
+grt = DateTime(2022,6,10,10,56,0):Minute(1):DateTime(2022,6,10,12,48,0) |> collect
 len = Dates.value(grt[end] .- grt[1])  / 1000 
 gr = 21.50./60
-grD = 13.0 .+ gr*(0:1:len) |> collect
+grD = 3.0 .+ gr*(0:1:len) |> collect
 
 data = Dict(("D" => smps.Dp[ii]), ("S" => (myS)),
     ("t" => t), ("Nt" => smps.Nt), 
