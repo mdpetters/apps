@@ -110,19 +110,66 @@ tgf20, modek20, modegf20, gM20 = get_mode(Dds[2])
 
 
 modek20[modek20 .< 0] .= NaN
-
-
 modek30[modek30 .< 0] .= NaN
-
 modek40[modek40 .< 0] .= NaN
-
-
 modek50[modek50 .< 0] .= NaN
+
+# event 1 k----
+event1ii50 = (tgf50 .>= DateTime(2022,6,23,11,50,0)) .& (tgf50.<= DateTime(2022,6,23,16,00,0) )
+event1ii40 = (tgf40 .>= DateTime(2022,6,23,11,50,0)) .& (tgf40.<= DateTime(2022,6,23,16,00,0) )
+event1ii30 = (tgf30 .>= DateTime(2022,6,23,11,50,0)) .& (tgf30.<= DateTime(2022,6,23,16,00,0) )
+event1ii20 = (tgf20 .>= DateTime(2022,6,23,11,50,0)) .& (tgf20.<= DateTime(2022,6,23,16,00,0) )
+
+
+modekall = vcat(modek20[event1ii20],modek30[event1ii30],modek40[event1ii40],modek50[event1ii50])
+eventk_allnm = mean(modekall)
+eventk_allstdnm = std(modekall)
+# event 1 prior k----
+pevent1ii50 = (tgf50 .> DateTime(2022,6,23,09,50,0)) .& (tgf50.< DateTime(2022,6,23,11,50,0) )
+pevent1ii40 = (tgf40 .> DateTime(2022,6,23,09,50,0)) .& (tgf40.< DateTime(2022,6,23,11,50,0) )
+pevent1ii30 = (tgf30 .> DateTime(2022,6,23,09,50,0)) .& (tgf30.< DateTime(2022,6,23,11,50,0) )
+pevent1ii20 = (tgf20 .> DateTime(2022,6,23,09,50,0)) .& (tgf20.< DateTime(2022,6,23,11,50,0) )
+
+modekpall = vcat(modek20[pevent1ii20],modek30[pevent1ii30],modek40[pevent1ii40],modek50[pevent1ii50])
+pevents = filter(!isnan, modekpall)
+peventk_allnm = mean(pevents)
+peventk_allstdnm = std(pevents)
+
+#---event 2 k-----
+event2ii50 = (tgf50 .>= DateTime(2022,6,23,09,48,0)) .& (tgf50.<= DateTime(2022,6,23,13,10,0) )
+event2ii40 = (tgf40 .>= DateTime(2022,6,23,09,48,0)) .& (tgf40.<= DateTime(2022,6,23,13,10,0) )
+event2ii30 = (tgf30 .>= DateTime(2022,6,23,09,48,0)) .& (tgf30.<= DateTime(2022,6,23,13,10,0) )
+event2ii20 = (tgf20 .>= DateTime(2022,6,23,09,48,0)) .& (tgf20.<= DateTime(2022,6,23,13,10,0) )
+
+
+modek2all = vcat(modek20[event2ii20],
+modek30[event2ii30],
+modek40[event2ii40],
+modek50[event2ii50])
+events2 = filter(!isnan, modek2all)
+
+eventk2_allnm = mean(events2)
+eventk2_allstdnm = std(events2)
+#----event 2 prior k----
+pevent2ii50 = (tgf50 .> DateTime(2022,6,23,07,48,0)) .& (tgf50.< DateTime(2022,6,23,09,48,0) )
+pevent2ii40 = (tgf40 .> DateTime(2022,6,23,07,48,0)) .& (tgf40.< DateTime(2022,6,23,09,48,0) )
+pevent2ii30 = (tgf30 .> DateTime(2022,6,23,07,48,0)) .& (tgf30.< DateTime(2022,6,23,09,48,0) )
+pevent2ii20 = (tgf20 .> DateTime(2022,6,23,07,48,0)) .& (tgf20.< DateTime(2022,6,23,09,48,0) )
+
+modek2pall = vcat(modek20[pevent2ii20],
+modek30[pevent2ii30],
+modek40[pevent2ii40],
+modek50[pevent2ii50])
+
+pevents2 = filter(!isnan, modek2pall)
+peventk2_allnm = mean(pevents2)
+peventk2_allstdnm = std(pevents2)
+
 
 
 grt = DateTime(2022,6,23,11,50,0):Minute(1):DateTime(2022,6,23,16,00,0) |> collect
 len = Dates.value(grt[end] .- grt[1])  / 1000 
-gr = 12.50./45
+gr = 16.50./60
 grD = 3.0 .+ gr*(0:1:len) |> collect
 
 grt2 = DateTime(2022,6,23,09,48,0):Minute(1):DateTime(2022,6,23,13,10,0) |> collect
