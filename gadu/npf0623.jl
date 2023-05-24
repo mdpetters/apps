@@ -218,7 +218,8 @@ data = Dict( "D" => Dpnew, ("S" => mySnew),
     ("tgf40" => tgf40), ("k40" => modek40),
     ("tgf50" => tgf50), ("k50" => modek50),
     ("tcpc" => cpcu.df[!,:t].-Hour(5)), ("Ncpc" => cpcu.df[!,:N]),
-    ("grt" => grt), ("grD" => grD))
+    ("grt" => grt), ("grD" => grD),
+    ("grt2" => grt2), ("grD2" => grD2))
 jdata = JSON.json(data)
 
 open("data.js", "w") do file
