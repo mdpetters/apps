@@ -97,7 +97,7 @@ smps = load_aossmps(ss, ts)
 cpcu = load_cpcu(ss, ts)
 
 t = Dates.format.(smps.t .- Hour(5), "yyyy-mm-dd HH:MM:SS") 
-ii = (smps.Dp .> 1) .& (smps.Dp .< 110)
+ii = (smps.Dp .> 10.5) .& (smps.Dp .< 110)
 
 myS = smps.S[ii, :]'
 myS[myS.<0] .= NaN
@@ -177,15 +177,49 @@ len2 = Dates.value(grt2[end] .- grt2[1])  / 1000
 gr2 = 8.75./60
 grD2 = 22.0 .+ gr2*(0:1:len2) |> collect
 
-data = Dict(("D" => smps.Dp[ii]), ("S" => (myS)),
+#-------NCSU RDMA starts------ 
+function stats_df(df, ts, f)
+    nam = names(df)
+    mapfoldl(vcat, ts) do tts
+        @chain begin
+            filter(:t => t -> (t .>= tts) .& (t .< tts + Minute(30)), df)
+            map(f, eachcol(_[!, 2:end]))
+            hcat(DataFrame(; t = tts), DataFrame(_', nam[2:end]))
+        end
+    end
+end
+
+dfr = CSV.read("../flaggedlevel3/hou180ncsurdmaM1.b1.20220601.csv", DataFrame)
+
+tr = dfr[4:end, :timeISO8601].-Hour(5)
+
+Dpr = dfr[2, 6:end] |> Vector
+iir = (Dpr .>= 5) .& (Dpr .<= 10.5)
+
+Nr = dfr[4:end, 6:end] |> Matrix
+trdm = dfr[4:end, :timeISO8601]
+
+tsr = DateTime(ss):Minute(5):(DateTime(ss)+Day(1)-Second(1))
+
+
+newdf = hcat(DataFrame(; t = tr), DataFrame(Nr, :auto))
+rdmaReduced = stats_df(newdf, tsr, mean) 
+
+rdma515 = rdmaReduced[:,2:end][:,iir] |> Matrix
+
+#-------NCSU RDMA ends--------
+mySnew= hcat(rdma515, myS)
+Dpnew = vcat(Float64.(Dpr[iir]),Float64.(smps.Dp[ii]))
+data = Dict( "D" => Dpnew, ("S" => mySnew),
+    # ("D" => smps.Dp[ii]), ("S" => (myS)),
+ 
     ("t" => t), ("Nt" => smps.Nt), 
     ("tgf20" => tgf20), ("k20" => modek20), 
     ("tgf30" => tgf30), ("k30" => modek30),
     ("tgf40" => tgf40), ("k40" => modek40),
     ("tgf50" => tgf50), ("k50" => modek50),
     ("tcpc" => cpcu.df[!,:t].-Hour(5)), ("Ncpc" => cpcu.df[!,:N]),
-    ("grt" => grt), ("grD" => grD),
-    ("grt2" => grt2), ("grD2" => grD2))
+    ("grt" => grt), ("grD" => grD))
 jdata = JSON.json(data)
 
 open("data.js", "w") do file

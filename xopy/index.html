@@ -2,6 +2,12 @@
 <html>
 
 <head>
+    <!-- <script>
+        function autoreload() {
+            location.reload();
+        }
+        setInterval(autoreload, 3000); -->
+    </script>
     <script src="plotly-2.20.0.min.js" charset="utf-8"></script>
     <script src="module.js" charset="utf-8"></script>
     <script src="data.js"></script>
@@ -78,7 +84,7 @@
             },
             height: 160,
             xaxis: {
-                range: ["2022-08-17 9:00:00", "2022-08-17 18:00:00"],
+                range: ["2022-08-17 8:00:00", "2022-08-17 15:00:00"],
                 // range: ["2022-08-17 00:00:00", "2022-08-18 00:00:00"]
             },
             yaxis: {
@@ -131,7 +137,7 @@
                 // title: { text: "Local Time", standoff: 0 },
                 side: "bottom",
                 ticks: "inside",
-                range: ["2022-08-17 9:00:00", "2022-08-17 18:00:00"],
+                range: ["2022-08-17 8:00:00", "2022-08-17 15:00:00"],
                 minor: { showgrid: true, gridcolor: "#eeeeee" },
             },
             yaxis: {
@@ -202,7 +208,7 @@
                 // title: { text: "UTC Time", standoff: 0 },
                 side: "bottom",
                 ticks: "inside",
-                range: ["2022-08-17 9:00:00", "2022-08-17 18:00:00"],
+                range: ["2022-08-17 8:00:00", "2022-08-17 15:00:00"],
                 minor: { showgrid: true, gridcolor: "#eeeeee" }
             },
             yaxis: {

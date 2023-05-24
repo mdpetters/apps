@@ -3,12 +3,12 @@
 
 <head>
 
-    <!-- <script>
+    <script>
         function autoreload() {
             location.reload();
         }
         setInterval(autoreload, 3000);
-    </script> -->
+    </script>
     <script src="plotly-2.20.0.min.js" charset="utf-8"></script>
     <script src="module.js" charset="utf-8"></script>
     <script src="data.js"></script>
@@ -30,8 +30,8 @@
             x: data.t,
             y: data.D,
             z: data.S,
-            // zmin: 2,
-            // zmax: 7,
+            // zmin: 300.0,
+            // zmax: 6000.0,
             type: 'heatmap',
             cauto: false,
             line: {
@@ -92,11 +92,11 @@
                 // range: Math.log([10,100]),
                 type: "log",
                 title: { text: "D (nm)", standoff: 9 },
+                showticklabels: true,
                 tickvals: [1,2,5,10, 20, 50, 100],
                 ticks: ""
             }
         };
-
         var trace2a = {
             x: data.t,
             y: data.Nt,
@@ -132,10 +132,10 @@
                 t: 0,
                 pad: 4
             },
-            // width: 600,
+        
             height: 90,
             xaxis: {
-                // title: { text: "Local Time", standoff: 0 },
+  
                 side: "bottom",
                 ticks: "inside",
                 range: ["2022-07-12 6:00:00", "2022-07-12 15:00:00"],
@@ -203,10 +203,10 @@
                 t: 0,
                 pad: 4
             },
-            // width: 600,
+ 
             height: 190,
             xaxis: {
-                // title: { text: "UTC Time", standoff: 0 },
+
                 side: "bottom",
                 ticks: "inside",
                 range: ["2022-07-12 6:00:00", "2022-07-12 15:00:00"],
@@ -227,9 +227,10 @@
             displayModeBar: false
         }
 
-        // data = trace1//, trace2
 
-        Plotly.newPlot(plot1, [trace1a, trace1b], layout1, config);
+
+        Plotly.newPlot(plot1, [trace1a, trace1b], layout1,  config);
+
         Plotly.newPlot(plot2, [trace2a, trace2b], layout2, config);
         Plotly.newPlot(plot3, [trace3a, trace3b, trace3c, trace3d], layout3, config);
         console.log(Date.parse(data.t[10]))

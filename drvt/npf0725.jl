@@ -102,7 +102,7 @@ cpcu.df.N[CPCUTii] .= NaN
 
 t = Dates.format.(smps.t .- Hour(5), "yyyy-mm-dd HH:MM:SS") 
 
-ii = (smps.Dp .> 8) .& (smps.Dp .< 110)
+ii = (smps.Dp .> 10.5) .& (smps.Dp .< 110)
 
 jam1 = smps.t .- Hour(5)
 kk = findall((jam1 .> DateTime(2022,07,25,12,03,00)) .& (jam1 .< DateTime(2022,07,25,12,23,00)))
@@ -150,13 +150,49 @@ len = Dates.value(grt[end] .- grt[1])  / 1000
 gr = 6.50./60
 grD = 3.0 .+ gr*(0:1:len) |> collect
 
-data = Dict(("D" => smps.Dp[ii]), ("S" => (myS)),
+#-------NCSU RDMA starts------ 
+
+
+function stats_df(df, ts, f)
+    nam = names(df)
+    mapfoldl(vcat, ts) do tts
+        @chain begin
+            filter(:t => t -> (t .>= tts) .& (t .< tts + Minute(30)), df)
+            map(f, eachcol(_[!, 2:end]))
+            hcat(DataFrame(; t = tts), DataFrame(_', nam[2:end]))
+        end
+    end
+end
+
+dfr = CSV.read("../flaggedlevel3/hou180ncsurdmaM1.b1.20220601.csv", DataFrame)
+
+tr = dfr[4:end, :timeISO8601].-Hour(5)
+
+Dpr = dfr[2, 6:end] |> Vector
+iir = (Dpr .>= 5) .& (Dpr .<= 10.5)
+
+Nr = dfr[4:end, 6:end] |> Matrix
+trdm = dfr[4:end, :timeISO8601]
+
+tsr = DateTime(ss):Minute(5):(DateTime(ss)+Day(1)-Second(1))
+
+
+newdf = hcat(DataFrame(; t = tr), DataFrame(Nr, :auto))
+rdmaReduced = stats_df(newdf, tsr, mean) 
+
+rdma515 = rdmaReduced[:,2:end][:,iir] |> Matrix
+
+#-------NCSU RDMA ends--------
+mySnew= hcat(rdma515, myS)
+Dpnew = vcat(Float64.(Dpr[iir]),Float64.(smps.Dp[ii]))
+data = Dict( "D" => Dpnew, ("S" => mySnew),
+    # ("D" => smps.Dp[ii]), ("S" => (myS)),
+ 
     ("t" => t), ("Nt" => smps.Nt), 
     ("tgf20" => tgf20), ("k20" => modek20), 
     ("tgf30" => tgf30), ("k30" => modek30),
     ("tgf40" => tgf40), ("k40" => modek40),
     ("tgf50" => tgf50), ("k50" => modek50),
-    # ("tcpc" => [!,:t].-Hour(5)), ("Ncpc" => d[!,:N]),
     ("tcpc" => cpcu.df[!,:t].-Hour(5)), ("Ncpc" => cpcu.df[!,:N]),
     ("grt" => grt), ("grD" => grD))
 jdata = JSON.json(data)
