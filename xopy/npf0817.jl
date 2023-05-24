@@ -92,7 +92,7 @@ function get_mode(myDd)
 end
 
 ss = Date(2022, 8, 17)
-ts = DateTime(ss):Minute(1):(DateTime(ss)+Day(2)-Second(1))
+ts = DateTime(ss):Minute(1):(DateTime(ss)+Day(1)-Second(1))
 smps = load_aossmps(ss, ts)
 cpcu = load_cpcu(ss, ts)
 
@@ -149,34 +149,6 @@ gr = 19.0./60
 grD = 3.0 .+ gr*(0:1:len) |> collect
 
 
-function stats_df(df, ts, f)
-    nam = names(df)
-    mapfoldl(vcat, ts) do tts
-        @chain begin
-            filter(:t => t -> (t .>= tts) .& (t .< tts + Minute(30)), df)
-            map(f, eachcol(_[!, 2:end]))
-            hcat(DataFrame(; t = tts), DataFrame(_', nam[2:end]))
-        end
-    end
-end
-
-dfr = CSV.read("../flaggedlevel3/hou180ncsurdmaM1.b1.20220601.csv", DataFrame)
-
-tr = dfr[4:end, :timeISO8601].-Hour(5)
-
-Dpr = dfr[2, 6:end] |> Vector
-iir = (Dpr .>= 5) .& (Dpr .<= 15)
-
-Nr = dfr[4:end, 6:end] |> Matrix
-trdm = dfr[4:end, :timeISO8601]
-
-tsr = DateTime(ss):Minute(5):(DateTime(ss)+Day(1)-Second(1))
-
-
-newdf = hcat(DataFrame(; t = tr), DataFrame(Nr, :auto))
-rdmaReduced = stats_df(newdf, tsr, mean) 
-
-rdma515 = rdmaReduced[:,2:end][:,iir] |> Matrix
 #-------NCSU RDMA starts------ 
 function stats_df(df, ts, f)
     nam = names(df)
@@ -199,16 +171,18 @@ iir = (Dpr .>= 5) .& (Dpr .<= 10.5)
 Nr = dfr[4:end, 6:end] |> Matrix
 trdm = dfr[4:end, :timeISO8601]
 
-tsr = DateTime(ss):Minute(5):(DateTime(ss)+Day(1)-Second(1))
-
+tsr = DateTime(ss)-Day(1):Minute(5):(DateTime(ss)+Day(1)-Second(1))
 
 newdf = hcat(DataFrame(; t = tr), DataFrame(Nr, :auto))
 rdmaReduced = stats_df(newdf, tsr, mean) 
+forrdmaii = smps.t .- Hour(5)
 
-rdma515 = rdmaReduced[:,2:end][:,iir] |> Matrix
+rdmai = (rdmaReduced[:,:t] .>= forrdmaii[1]) .& (rdmaReduced[:,:t] .<= forrdmaii[end]) 
+rdma510 = rdmaReduced[rdmai,2:end][:,iir] |> Matrix
+
 
 #-------NCSU RDMA ends--------
-mySnew= hcat(rdma515, myS)
+mySnew= hcat(rdma510, myS)
 Dpnew = vcat(Float64.(Dpr[iir]),Float64.(smps.Dp[ii]))
 data = Dict( "D" => Dpnew, ("S" => mySnew),
 

@@ -151,8 +151,6 @@ gr = 6.50./60
 grD = 3.0 .+ gr*(0:1:len) |> collect
 
 #-------NCSU RDMA starts------ 
-
-
 function stats_df(df, ts, f)
     nam = names(df)
     mapfoldl(vcat, ts) do tts
@@ -174,16 +172,17 @@ iir = (Dpr .>= 5) .& (Dpr .<= 10.5)
 Nr = dfr[4:end, 6:end] |> Matrix
 trdm = dfr[4:end, :timeISO8601]
 
-tsr = DateTime(ss):Minute(5):(DateTime(ss)+Day(1)-Second(1))
-
+tsr = DateTime(ss)-Day(1):Minute(5):(DateTime(ss)+Day(1)-Second(1))
 
 newdf = hcat(DataFrame(; t = tr), DataFrame(Nr, :auto))
 rdmaReduced = stats_df(newdf, tsr, mean) 
+forrdmaii = smps.t .- Hour(5)
 
-rdma515 = rdmaReduced[:,2:end][:,iir] |> Matrix
+rdmai = (rdmaReduced[:,:t] .>= forrdmaii[1]) .& (rdmaReduced[:,:t] .<= forrdmaii[end]) 
+rdma510 = rdmaReduced[rdmai,2:end][:,iir] |> Matrix
 
 #-------NCSU RDMA ends--------
-mySnew= hcat(rdma515, myS)
+mySnew= hcat(rdma510, myS)
 Dpnew = vcat(Float64.(Dpr[iir]),Float64.(smps.Dp[ii]))
 data = Dict( "D" => Dpnew, ("S" => mySnew),
     # ("D" => smps.Dp[ii]), ("S" => (myS)),
